@@ -50,6 +50,28 @@ function render (domElements) : void {
     domElements.$panelOutput.find("textarea").val(state.output);
     domElements.$inputCount.empty().text(countDisplay(stats.inputCount));
     domElements.$outputCount.empty().text(countDisplay(stats.outputCount));
+
+    if (stats.isAllNumeric) {
+        domElements.$panelInfo.closest(".row").show();
+        
+        const $tbody = domElements.$panelInfo.find("table tbody");
+        $tbody.find("td.avg").text(stats.ks["avg"]);
+        $tbody.find("td.min").text(stats.ks["min"]);
+        $tbody.find("td.k99gt").text(stats.ks["k99gt"]);
+        $tbody.find("td.k95gt").text(stats.ks["k95gt"]);
+        $tbody.find("td.k90gt").text(stats.ks["k90gt"]);
+        $tbody.find("td.k75gt").text(stats.ks["k75gt"]);
+        $tbody.find("td.k50").text(stats.ks["k50"]);
+        $tbody.find("td.k75lt").text(stats.ks["k75lt"]);
+        $tbody.find("td.k90lt").text(stats.ks["k90lt"]);
+        $tbody.find("td.k95lt").text(stats.ks["k95lt"]);
+        $tbody.find("td.k99lt").text(stats.ks["k99lt"]);
+        $tbody.find("td.max").text(stats.ks["max"]);
+        $tbody.find("td.sum").text(stats.ks["sum"]);
+    } else {
+        domElements.$panelInfo.closest(".row").hide();
+    }
+    
 }
 
 function countDisplay (input : number) : string {
@@ -161,8 +183,17 @@ function gatherStatistics (_state : StateInterface, _stats : Stats) : Stats {
     const {...stats} = _stats;
 
     const isNumeric = x => Number(x) === x;
-    const acc = state.acc.map(x => Number(x));
+    let acc = state.acc.map(x => Number(x));
     stats.isAllNumeric = acc.every(isNumeric);
+
+    //if not numeric, see if its all numeric if we remove the first element (because of a header)
+    if (!stats.isAllNumeric) {
+       if (!isNumeric(acc[0])) {
+           acc = acc.slice(1, acc.length);
+           stats.isAllNumeric = acc.every(isNumeric);
+           console.log(acc, stats);
+       } 
+    }
 
     if (stats.isAllNumeric) {
         const accForward = acc.sort((a,b) => a -b);
@@ -179,7 +210,8 @@ function gatherStatistics (_state : StateInterface, _stats : Stats) : Stats {
             k90lt: kthPercentile(90, accForward, true),
             k95lt: kthPercentile(95, accForward, true),
             k99lt: kthPercentile(99, accForward, true),
-            max: Math.max(...acc)
+            max: Math.max(...acc),
+            sum: acc.reduce((a,b) => a+b, 0),
         };
     }
 
@@ -200,9 +232,7 @@ function kthPercentile (k : number, input : number[], assumeSorted: boolean = fa
         
         return input[kth+1];
     } else {
-        
-        let o = (input[Math.floor(kth)-1] + input[Math.ceil(kth)-1]) / 2;
-        console.log(k, kth, input.length, Math.floor(kth)-1, Math.ceil(kth)-1, o, input.join(''));
+        return (input[Math.floor(kth)] + input[Math.ceil(kth)]) / 2;
     }
 }
 

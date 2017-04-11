@@ -19,13 +19,23 @@
 <body>
 	<div class="content">
 		<div class="row">
-			<div class="col-md-10 col-md-offset-1">
+			<div class="col-md-5 col-md-offset-1">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">Input <span class="input-count"></span></h3>
 					</div>
 					<div class="panel-body panel-input">
 						<textarea style="width: 100%; height: 200px;" class="input"></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Output <span class="output-count"></span></h3>
+					</div>
+					<div class="panel-body panel-output">
+						<textarea style="width: 100%; height: 200px;"></textarea>
 					</div>
 				</div>
 			</div>
@@ -115,22 +125,55 @@
 			<div class="col-md-10 col-md-offset-1">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h3 class="panel-title">Output <span class="output-count"></span></h3>
-					</div>
-					<div class="panel-body panel-output">
-						<textarea style="width: 100%; height: 200px;"></textarea>
-					</div>
-				</div>
-			</div>
-		</div>	
-		<div class="row">
-			<div class="col-md-10 col-md-offset-1">
-				<div class="panel panel-default">
-					<div class="panel-heading">
 						<h3 class="panel-title">Information</h3>
 					</div>
 					<div class="panel-body panel-info">
-						
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Sum</th>
+									<th>Average</th>
+								</tr>	
+							</thead>
+							<tbody>
+								<tr>
+									<td class="sum"></td>
+									<td class="avg"></td>
+								</tr>
+							</tbody>	
+						</table>	
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Min</th>
+									<th>K99</th>
+									<th>K95</th>
+									<th>K90</th>
+									<th>K75</th>
+									<th>Median</th>
+									<th>K75</th>
+									<th>K90</th>
+									<th>K95</th>
+									<th>K99</th>
+									<th>Max</th>
+								</tr>	
+							</thead>
+							<tbody>
+								<tr>
+									<td class="min"></td>
+									<td class="k99gt"></td>
+									<td class="k95gt"></td>
+									<td class="k90gt"></td>
+									<td class="k75gt"></td>
+									<td class="k50"></td>
+									<td class="k75lt"></td>
+									<td class="k90lt"></td>
+									<td class="k95lt"></td>
+									<td class="k99lt"></td>
+									<td class="max"></td>
+								</tr>
+							</tbody>	
+						</table>	
 					</div>
 				</div>
 			</div>
