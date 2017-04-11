@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import * as $ from 'jquery';
 (<any>window).jQuery = $;
 
+import * as ss from 'simple-statistics';
+
 interface StateInterface {
     input: string,
     acc: string[],
@@ -68,6 +70,9 @@ function render (domElements) : void {
         $tbody.find("td.k99lt").text(stats.ks["k99lt"]);
         $tbody.find("td.max").text(stats.ks["max"]);
         $tbody.find("td.sum").text(stats.ks["sum"]);
+        $tbody.find("td.variance").text(stats.ks["variance"]);
+        $tbody.find("td.stddev").text(stats.ks["stddev"]);
+        $tbody.find("td.mode").text(stats.ks["mode"]);
     } else {
         domElements.$panelInfo.closest(".row").hide();
     }
@@ -191,15 +196,14 @@ function gatherStatistics (_state : StateInterface, _stats : Stats) : Stats {
        if (!isNumeric(acc[0])) {
            acc = acc.slice(1, acc.length);
            stats.isAllNumeric = acc.every(isNumeric);
-           console.log(acc, stats);
-       } 
+       }
     }
 
     if (stats.isAllNumeric) {
         const accForward = acc.sort((a,b) => a -b);
         const accBackward = [...acc].reverse();
         stats.ks = {
-            avg: _.mean(acc),
+            avg: _.mean(acc).toFixed(3),
             min: Math.min(...acc),
             k99gt: kthPercentile(99, accBackward, true),
             k95gt: kthPercentile(95, accBackward, true),
@@ -212,6 +216,9 @@ function gatherStatistics (_state : StateInterface, _stats : Stats) : Stats {
             k99lt: kthPercentile(99, accForward, true),
             max: Math.max(...acc),
             sum: acc.reduce((a,b) => a+b, 0),
+            variance: ss.variance(accForward).toFixed(3),
+            stddev: ss.standardDeviation(accForward).toFixed(3),
+            mode: ss.modeSorted(accForward),
         };
     }
 
