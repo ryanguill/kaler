@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
+
+  <meta name="description" content="<%= htmlWebpackPlugin.options.title %>">
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  
+</head>
+
+<body>
+	<div class="content">
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Input <span class="input-count"></span></h3>
+					</div>
+					<div class="panel-body panel-input">
+						<textarea style="width: 100%; height: 200px;" class="input"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Options</h3>
+					</div>
+					<div class="panel-body panel-options">
+						<div class="row">
+							<div class="col-md-4">
+								<form class="form-horizontal" >
+									<div class="form-group">
+										<label for="inputDelimiter" class="col-sm-6 control-label">Input Delimiter</label>
+										<div class="col-md-6">
+											<input type="text" value="\n" class="form-control input-sm" id="inputDelimiter" />
+										</div>	
+									</div>
+									<div class="form-group">
+										<label for="outputDelimiter" class="col-sm-6 control-label">Output Delimiter</label>
+										<div class="col-md-6">
+											<input type="text" value="," class="form-control input-sm" id="outputDelimiter" />
+										</div>	
+									</div>
+								</form>	
+							</div>
+							<div class="col-md-4">
+								<form class="form-horizontal" >
+									<div class="form-group">
+										<label for="distinctValues" class="col-sm-6 control-label">Distinct Values?</label>
+										<div class="col-md-6">
+											<select class="form-control input-sm" id="distinctValues">
+												<option value="FALSE">No</option>
+												<option value="DISTINCT">Yes</option>
+												<option value="DISTINCT-CASE-INSENSITIVE">Yes, Case Insensitive</option>
+											</select>	
+										</div>	
+									</div>
+									<div class="form-group">
+										<label for="sortValues" class="col-sm-6 control-label">Sort Values?</label>
+										<div class="col-md-6">
+											<select class="form-control input-sm" id="sortValues">
+												<option value="FALSE" selected="true">No Sort</option>
+												<option value="NUMERIC|ASC" >Numeric ASC</option>
+												<option value="NUMERIC|DESC" >Numeric DESC</option>
+												<option value="TEXT|ASC" >Text ASC</option>
+												<option value="TEXT|DESC" >Text DESC</option>
+												<option value="TEXT-CASE-INSENSITIVE|ASC" >Text Case Insensitive ASC</option>
+												<option value="TEXT-CASE-INSENSITIVE|DESC" >Text Case Insensitive DESC</option>
+											</select>	
+										</div>	
+									</div>
+								</form>	
+							</div>
+							<div class="col-md-4">
+								<form class="form-horizontal" >
+									<div class="form-group">
+										<label for="quoteValues" class="col-sm-6 control-label">Quote Values?</label>
+										<div class="col-md-6">
+											<input type="checkbox" id="quoteValues" />
+										</div>	
+									</div>
+									<div class="form-group">
+										<label for="trimValues" class="col-sm-6 control-label">Trim Values?</label>
+										<div class="col-md-6">
+											<input type="checkbox" id="trimValues" />
+										</div>	
+									</div>
+									<!--
+									<div class="form-group">
+										<label for="ignoreEmptyValues" class="col-sm-6 control-label">Ignore Empty Values?</label>
+										<div class="col-md-6">
+											<input type="checkbox" id="ignoreEmptyValues" />
+										</div>	
+									</div>									
+									-->
+								</form>	
+							</div>
+						</div>		
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Output <span class="output-count"></span></h3>
+					</div>
+					<div class="panel-body panel-output">
+						<textarea style="width: 100%; height: 200px;"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>	
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Information</h3>
+					</div>
+					<div class="panel-body panel-info">
+						
+					</div>
+				</div>
+			</div>
+		</div>	
+
+	</div>
+</body>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</html>
