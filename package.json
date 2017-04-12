@@ -17,6 +17,7 @@
   "author": "ryanguill",
   "license": "ISC",
   "devDependencies": {
+    "@types/google.visualization": "0.0.33",
     "@types/jquery": "^2.0.41",
     "@types/lodash": "^4.14.50",
     "cross-env": "^3.1.4",

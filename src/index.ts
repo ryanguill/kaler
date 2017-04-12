@@ -21,7 +21,10 @@ interface Stats {
     inputCount: number,
     outputCount: number,
     isAllNumeric: boolean,
-    ks: Object
+    ks: Object,
+    accForward: number[]
+    accBackward: number[]
+
 }
 
 function render (domElements) : void {
@@ -30,7 +33,9 @@ function render (domElements) : void {
         inputCount: 0,
         outputCount: 0,
         isAllNumeric: false,
-        ks: {}
+        ks: {},
+        accForward: [],
+        accBackward: []
     }
 
     state = parse(state);
@@ -46,18 +51,18 @@ function render (domElements) : void {
     stats = gatherStatistics(state, stats);
     state = join(state);
     
-    console.log(state, stats);
-    console.log(stats.ks);
+    //console.log(state, stats);
+    //console.log(stats.ks);
     
     domElements.$panelOutput.find("textarea").val(state.output);
     domElements.$inputCount.empty().text(countDisplay(stats.inputCount));
     domElements.$outputCount.empty().text(countDisplay(stats.outputCount));
 
     if (stats.isAllNumeric) {
-        domElements.$panelInfo.closest(".row").show();
+        domElements.$panelStats.closest(".row").show();
         
-        const $tbody = domElements.$panelInfo.find("table tbody");
-        $tbody.find("td.avg").text(stats.ks["avg"]);
+        const $tbody = domElements.$panelStats.find("table tbody");
+        
         $tbody.find("td.min").text(stats.ks["min"]);
         $tbody.find("td.k99gt").text(stats.ks["k99gt"]);
         $tbody.find("td.k95gt").text(stats.ks["k95gt"]);
@@ -69,14 +74,88 @@ function render (domElements) : void {
         $tbody.find("td.k95lt").text(stats.ks["k95lt"]);
         $tbody.find("td.k99lt").text(stats.ks["k99lt"]);
         $tbody.find("td.max").text(stats.ks["max"]);
-        $tbody.find("td.sum").text(stats.ks["sum"]);
-        $tbody.find("td.variance").text(stats.ks["variance"]);
-        $tbody.find("td.stddev").text(stats.ks["stddev"]);
-        $tbody.find("td.mode").text(stats.ks["mode"]);
+
+        domElements.$panelStats.find("div.avg").text(stats.ks["avg"]);
+        domElements.$panelStats.find("div.sum").text(stats.ks["sum"]);
+        domElements.$panelStats.find("div.variance").text(stats.ks["variance"]);
+        domElements.$panelStats.find("div.stddev").text(stats.ks["stddev"]);
+        domElements.$panelStats.find("div.mode").text(stats.ks["mode"]);
+
+        
+        drawCandlestickChart([stats.ks["min"], stats.ks["k75gt"], stats.ks["k75lt"], stats.ks["max"]]);
+        drawHistogramChart(stats.accForward);
     } else {
-        domElements.$panelInfo.closest(".row").hide();
+        domElements.$panelStats.closest(".row").hide();
     }
     
+}
+
+//expects 4 values
+function drawCandlestickChart (input) {
+    
+    input.unshift('');
+    var data = google.visualization.arrayToDataTable([
+        input
+    // Treat first row as data as well.
+    ], true);
+
+    var options = {
+        legend:'none',
+        colors: ['#444'],
+        chartArea: {left:50, top:25, right:10, bottom:25, width:'100%', height: '100%' },
+    };
+
+    var chart = new google.visualization.CandlestickChart(document.getElementById('candlestick_chart'));
+
+    chart.draw(data, options);
+}
+
+function drawHistogramChart (input) {
+    
+    const data = input.map(x => ['', x]);
+    data.unshift(['Name', 'Amount']);
+    var dataTable = google.visualization.arrayToDataTable(data);
+
+    var options = {
+        
+        legend: { position: 'none' },
+        colors: ['#444'],
+        bar: { groupWidth: 0 },
+        chartArea: {left:50, top:25, right:10, bottom:25, width:'100%', height: '100%' },
+    };
+
+    var chart = new google.visualization.Histogram(document.getElementById('histogram_chart'));
+
+    chart.draw(dataTable, options);
+}
+
+function drawScatterChart (stats) {
+    //aggregate the data
+    const aggData = stats.accForward.reduce(function (acc, element) {
+        const grouping = acc.data.find(x => x[0] === element);
+        if (grouping) {
+            const x = ++grouping[1];
+            if (x > acc.max) {
+                acc.max = x;
+            }
+        } else {
+            acc.data.push([element, 1]);
+        }
+        return acc;
+    }, {data:[], min:0, max:Infinity})
+
+    aggData.data.unshift(["X", "Freq"]);
+    var dataTable = google.visualization.arrayToDataTable(aggData.data);
+    var options = {
+          vAxis: {title: 'Freq', minValue: 0, maxValue: aggData.max},
+          legend: 'none',
+          colors: ['#333'],
+          chartArea: {left:0, top:0, right:0, bottom:0, width:'100%', height: '100%' },
+        }
+
+    var chart = new google.visualization.ScatterChart(document.getElementById('scatter_chart'));
+    chart.draw(dataTable, options);
+
 }
 
 function countDisplay (input : number) : string {
@@ -189,36 +268,36 @@ function gatherStatistics (_state : StateInterface, _stats : Stats) : Stats {
 
     const isNumeric = x => Number(x) === x;
     let acc = state.acc.map(x => Number(x));
-    stats.isAllNumeric = acc.every(isNumeric);
+    stats.isAllNumeric = acc.every(isNumeric) && acc.length > 0;
 
     //if not numeric, see if its all numeric if we remove the first element (because of a header)
-    if (!stats.isAllNumeric) {
+    if (!stats.isAllNumeric && acc.length > 0) {
        if (!isNumeric(acc[0])) {
            acc = acc.slice(1, acc.length);
-           stats.isAllNumeric = acc.every(isNumeric);
+           stats.isAllNumeric = acc.every(isNumeric) && acc.length > 0;
        }
     }
 
     if (stats.isAllNumeric) {
-        const accForward = acc.sort((a,b) => a -b);
-        const accBackward = [...acc].reverse();
+        stats.accForward = acc.sort((a,b) => a -b);
+        stats.accBackward = [...acc].reverse();
         stats.ks = {
             avg: _.mean(acc).toFixed(3),
             min: Math.min(...acc),
-            k99gt: kthPercentile(99, accBackward, true),
-            k95gt: kthPercentile(95, accBackward, true),
-            k90gt: kthPercentile(90, accBackward, true),
-            k75gt: kthPercentile(75, accBackward, true),
-            k50: kthPercentile(50, accForward, true),
-            k75lt: kthPercentile(75, accForward, true),
-            k90lt: kthPercentile(90, accForward, true),
-            k95lt: kthPercentile(95, accForward, true),
-            k99lt: kthPercentile(99, accForward, true),
+            k99gt: kthPercentile(99, stats.accBackward, true),
+            k95gt: kthPercentile(95, stats.accBackward, true),
+            k90gt: kthPercentile(90, stats.accBackward, true),
+            k75gt: kthPercentile(75, stats.accBackward, true),
+            k50: kthPercentile(50, stats.accForward, true),
+            k75lt: kthPercentile(75, stats.accForward, true),
+            k90lt: kthPercentile(90, stats.accForward, true),
+            k95lt: kthPercentile(95, stats.accForward, true),
+            k99lt: kthPercentile(99, stats.accForward, true),
             max: Math.max(...acc),
             sum: acc.reduce((a,b) => a+b, 0),
-            variance: ss.variance(accForward).toFixed(3),
-            stddev: ss.standardDeviation(accForward).toFixed(3),
-            mode: ss.modeSorted(accForward),
+            variance: ss.variance(stats.accForward).toFixed(3),
+            stddev: ss.standardDeviation(stats.accForward).toFixed(3),
+            mode: ss.modeSorted(stats.accForward),
         };
     }
 
@@ -251,15 +330,18 @@ export default class Main {
             $panelInput: $("div.panel-input"),
             $panelOptions: $("div.panel-options"),
             $panelOutput: $("div.panel-output"),
-            $panelInfo: $("div.panel-info"),
+            $panelStats: $("div.panel-stats"),
             $inputCount: $(".input-count"),
             $outputCount: $(".output-count")
         };
         
+        
+
         domElements.$panelInput.on("change keyup", e => render(domElements));
         domElements.$panelOptions.on("change keyup", e => render(domElements));
 
-        domElements.$panelInput.find("textarea").val(`1
+        google.charts.setOnLoadCallback(function() {
+            domElements.$panelInput.find("textarea").val(`1
 2
 3
 4
@@ -269,6 +351,7 @@ export default class Main {
 8
 9
 10`).change();
+        }); 
     }
 }
 

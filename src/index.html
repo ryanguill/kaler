@@ -2,39 +2,74 @@
 <html lang="">
 
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>
-    <%= htmlWebpackPlugin.options.title %>
-  </title>
+	<title>
+	<%= htmlWebpackPlugin.options.title %>
+	</title>
 
-  <meta name="description" content="<%= htmlWebpackPlugin.options.title %>">
+	<meta name="description" content="<%= htmlWebpackPlugin.options.title %>">
 
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script>
+		google.charts.load('current', {'packages':['corechart']});
+	</script>	
+
+	<style>
+		.datum-block {
+			text-align: center;
+			margin: 0 5px;
+		}
+		.datum-block .datum {
+			font-size: 20pt;
+			font-weight:bold;
+		}
+		.datum-block .datum-label {
+			font-size: larger;
+		}
+		table.distribution-table tr td, table.distribution-table tr th {
+			text-align: center;
+		}
+
+		div.panel-stats div.panel-heading {
+			/*background-color: #d1c4e9;*/
+		}
+		div.panel-input div.panel-heading {
+			background-color: #bbdefb;
+		}
+		div.panel-output div.panel-heading {
+			background-color: #c8e6c9;
+		}
+		div.panel-options div.panel-heading {
+			/*background-color: #d7ccc8;*/
+		}
+
+	</style>	
 </head>
 
 <body>
 	<div class="content">
 		<div class="row">
 			<div class="col-md-5 col-md-offset-1">
-				<div class="panel panel-default">
+				<div class="panel panel-default panel-input">
 					<div class="panel-heading">
 						<h3 class="panel-title">Input <span class="input-count"></span></h3>
 					</div>
-					<div class="panel-body panel-input">
+					<div class="panel-body">
 						<textarea style="width: 100%; height: 200px;" class="input"></textarea>
 					</div>
 				</div>
 			</div>
 			<div class="col-md-5">
-				<div class="panel panel-default">
+				<div class="panel panel-default panel-output">
 					<div class="panel-heading">
 						<h3 class="panel-title">Output <span class="output-count"></span></h3>
 					</div>
-					<div class="panel-body panel-output">
+					<div class="panel-body">
 						<textarea style="width: 100%; height: 200px;"></textarea>
 					</div>
 				</div>
@@ -42,11 +77,11 @@
 		</div>
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1">
-				<div class="panel panel-default">
+				<div class="panel panel-default panel-options">
 					<div class="panel-heading">
 						<h3 class="panel-title">Options</h3>
 					</div>
-					<div class="panel-body panel-options">
+					<div class="panel-body">
 						<div class="row">
 							<div class="col-md-4">
 								<form class="form-horizontal" >
@@ -123,63 +158,80 @@
 		</div>
 		<div class="row">
 			<div class="col-md-10 col-md-offset-1">
-				<div class="panel panel-default">
+				<div class="panel panel-default panel-stats">
 					<div class="panel-heading">
 						<h3 class="panel-title">Information</h3>
 					</div>
-					<div class="panel-body panel-info">
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Sum</th>
-									<th>Average</th>
-									<th>Mode</th>
-									<th>Variance</th>
-									<th>Std. Dev.</th>
-								</tr>	
-							</thead>
-							<tbody>
-								<tr>
-									<td class="sum"></td>
-									<td class="avg"></td>
-									<td class="mode"></td>
-									<td class="variance"></td>
-									<td class="stddev"></td>
-								</tr>
-							</tbody>	
-						</table>	
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Min</th>
-									<th>K99</th>
-									<th>K95</th>
-									<th>K90</th>
-									<th>K75</th>
-									<th>Median</th>
-									<th>K75</th>
-									<th>K90</th>
-									<th>K95</th>
-									<th>K99</th>
-									<th>Max</th>
-								</tr>	
-							</thead>
-							<tbody>
-								<tr>
-									<td class="min"></td>
-									<td class="k99gt"></td>
-									<td class="k95gt"></td>
-									<td class="k90gt"></td>
-									<td class="k75gt"></td>
-									<td class="k50"></td>
-									<td class="k75lt"></td>
-									<td class="k90lt"></td>
-									<td class="k95lt"></td>
-									<td class="k99lt"></td>
-									<td class="max"></td>
-								</tr>
-							</tbody>	
-						</table>	
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-12 datum-stats">
+								
+								<div class="well col-md-2 datum-block">
+									<div class="sum datum"></div>
+									<div class="datum-label">Sum</div>
+								</div>	
+								<div class="well col-md-2 datum-block">
+									<div class="avg datum"></div>
+									<div class="datum-label">Mean</div>
+								</div>	
+								<div class="well col-md-2 datum-block">
+									<div class="mode datum"></div>
+									<div class="datum-label">Mode</div>
+								</div>	
+								<div class="well col-md-2 datum-block">
+									<div class="variance datum"></div>
+									<div class="datum-label">Variance</div>
+								</div>	
+								<div class="well col-md-2 datum-block">
+									<div class="stddev datum"></div>
+									<div class="datum-label">Standard Deviation</div>
+								</div>	
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">		
+								<table class="table distribution-table">
+									<thead>
+										<tr>
+											<th style="width: 10%">Min</th>
+											<th style="width: 8%">K99</th>
+											<th style="width: 8%">K95</th>
+											<th style="width: 8%">K90</th>
+											<th style="width: 8%">K75</th>
+											<th style="width: 10%">Median</th>
+											<th style="width: 8%">K75</th>
+											<th style="width: 8%">K90</th>
+											<th style="width: 8%">K95</th>
+											<th style="width: 8%">K99</th>
+											<th style="width: 10%">Max</th>
+										</tr>	
+									</thead>
+									<tbody>
+										<tr>
+											<td class="min"></td>
+											<td class="k99gt"></td>
+											<td class="k95gt"></td>
+											<td class="k90gt"></td>
+											<td class="k75gt"></td>
+											<td class="k50"></td>
+											<td class="k75lt"></td>
+											<td class="k90lt"></td>
+											<td class="k95lt"></td>
+											<td class="k99lt"></td>
+											<td class="max"></td>
+										</tr>
+									</tbody>	
+								</table>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2">	
+								<div id="candlestick_chart" style="width: 100%; height: 500px;"></div>
+							</div>
+							<div class="col-md-10">
+								<div id="histogram_chart" style="width: 100%; height: 500px;"></div>
+							</div>	
+						</div>		
 					</div>
 				</div>
 			</div>
