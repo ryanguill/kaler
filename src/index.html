@@ -23,6 +23,7 @@
 		.datum-block {
 			text-align: center;
 			margin: 0 5px;
+			width: 90vw;
 		}
 		.datum-block .datum {
 			font-size: 20pt;
@@ -31,23 +32,21 @@
 		.datum-block .datum-label {
 			font-size: larger;
 		}
+		.datum-stats {
+			display: flex;
+    		justify-content: space-between;
+		}
 		table.distribution-table tr td, table.distribution-table tr th {
 			text-align: center;
 		}
 
-		div.panel-stats div.panel-heading {
-			/*background-color: #d1c4e9;*/
-		}
 		div.panel-input div.panel-heading {
 			background-color: #bbdefb;
 		}
 		div.panel-output div.panel-heading {
 			background-color: #c8e6c9;
 		}
-		div.panel-options div.panel-heading {
-			/*background-color: #d7ccc8;*/
-		}
-
+		
 	</style>	
 </head>
 
@@ -156,7 +155,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row" style="display: none;">
 			<div class="col-md-10 col-md-offset-1">
 				<div class="panel panel-default panel-stats">
 					<div class="panel-heading">
@@ -166,23 +165,27 @@
 						<div class="row">
 							<div class="col-md-12 datum-stats">
 								
-								<div class="well col-md-2 datum-block">
+								<div class="well datum-block">
 									<div class="sum datum"></div>
 									<div class="datum-label">Sum</div>
 								</div>	
-								<div class="well col-md-2 datum-block">
+								<div class="well datum-block">
+									<div class="k50 datum"></div>
+									<div class="datum-label">median</div>
+								</div>	
+								<div class="well datum-block">
 									<div class="avg datum"></div>
 									<div class="datum-label">Mean</div>
 								</div>	
-								<div class="well col-md-2 datum-block">
+								<div class="well datum-block">
 									<div class="mode datum"></div>
 									<div class="datum-label">Mode</div>
 								</div>	
-								<div class="well col-md-2 datum-block">
+								<div class="well datum-block">
 									<div class="variance datum"></div>
 									<div class="datum-label">Variance</div>
 								</div>	
-								<div class="well col-md-2 datum-block">
+								<div class="well datum-block">
 									<div class="stddev datum"></div>
 									<div class="datum-label">Standard Deviation</div>
 								</div>	
@@ -235,10 +238,30 @@
 					</div>
 				</div>
 			</div>
-		</div>	
+		</div>
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="panel panel-default panel-about">
+					<div class="panel-heading">
+						<h3 class="panel-title">About Kaler</h3>
+					</div>
+					<div class="panel-body">
+						<p>This is a small side project that serves a few needs for me.  Hopefully it will help you too.</p>
+						<p>I do a lot data analysis and frequently need to take rows from one query and use them in another.  This project allows me to convert data delimited by one way and convert it to another delimiter quickly.</p>
+						<p>The other thing I want to do is take a set of numbers and get some information about it.  So if the information you paste is all numeric, this project will attempt to give you a few different useful statistics.  The usefulness of course will depend on what kind of numbers you put in.</p>
+						<p>Eventually I will probably also try to add some statisics for non-numeric data.  <a href="https://github.com/ryanguill/kaler/issues">Let me know</a> if that is something you would like to see or have any ideas or find any bugs.</p>
+						<p>The name Kaler doesn&apos;t mean anything.</p>
+						<p>The data you put in here does not go to any server, all calculations and graphing are done in your browser.</p>
+						<p>If you have anything to contribute please get in touch: <a href="https://github.com/ryanguill/kaler/">https://github.com/ryanguill/kaler/</a></p>
+						<p>If you want to see an example, click here: <a class="example-link" data-example="random-numbers">Random Numbers</a></p>
+						<a href="https://ryanguill.com" class="author">Ryan Guill</a><br />
+						<a href="https://twitter.com/ryanguill">@ryanguill</a>
+						
+					</div>
+				</div>
+			</div>
+		</div>					
 
 	</div>
 </body>
-
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </html>

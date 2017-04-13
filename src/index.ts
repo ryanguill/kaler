@@ -1,8 +1,11 @@
 import * as _ from 'lodash';
 import * as $ from 'jquery';
+import * as Promise from 'bluebird';
+import * as ss from 'simple-statistics';
+
 (<any>window).jQuery = $;
 
-import * as ss from 'simple-statistics';
+
 
 interface StateInterface {
     input: string,
@@ -15,6 +18,7 @@ interface StateInterface {
     sortDirection: 'ASC' | 'DESC',
     quoteValues: boolean,
     trimValues: boolean
+    stats: Stats
 }
 
 interface Stats {
@@ -28,66 +32,52 @@ interface Stats {
 }
 
 function render (domElements) : void {
-    let state = gatherState(domElements);
-    let stats = {
-        inputCount: 0,
-        outputCount: 0,
-        isAllNumeric: false,
-        ks: {},
-        accForward: [],
-        accBackward: []
-    }
+    Promise.resolve(gatherState(domElements))
+        .then(parse)
+        .then(trimValues)
+        .then(ignoreEmptyValues)
+        .then(distinctValues)
+        .then(quoteValues)
+        .then(sort)
+        .then(gatherStatistics)
+        .then(join)
+        .then(domRender(domElements));
+}
 
-    state = parse(state);
-    stats.inputCount = state.acc.length;
+function domRender (domElements) {
+    return function (state) {
+        const {output, stats} = state;
+        domElements.$panelOutput.find("textarea").val(output);
+        domElements.$inputCount.empty().text(countDisplay(stats.inputCount));
+        domElements.$outputCount.empty().text(countDisplay(stats.outputCount));
 
-    state = trimValues(state);
-    state = ignoreEmptyValues(state);
-    state = distinctValues(state);
-    state = quoteValues(state);
-    state = sort(state);
+        if (stats.isAllNumeric) {
+            domElements.$panelStats.closest(".row").show();
+            
+            domElements.$panelStats.find(".min").text(stats.ks["min"]);
+            domElements.$panelStats.find(".k99gt").text(stats.ks["k99gt"]);
+            domElements.$panelStats.find(".k95gt").text(stats.ks["k95gt"]);
+            domElements.$panelStats.find(".k90gt").text(stats.ks["k90gt"]);
+            domElements.$panelStats.find(".k75gt").text(stats.ks["k75gt"]);
+            domElements.$panelStats.find(".k50").text(stats.ks["k50"]);
+            domElements.$panelStats.find(".k75lt").text(stats.ks["k75lt"]);
+            domElements.$panelStats.find(".k90lt").text(stats.ks["k90lt"]);
+            domElements.$panelStats.find(".k95lt").text(stats.ks["k95lt"]);
+            domElements.$panelStats.find(".k99lt").text(stats.ks["k99lt"]);
+            domElements.$panelStats.find(".max").text(stats.ks["max"]);
 
-    stats.outputCount = state.acc.length;
-    stats = gatherStatistics(state, stats);
-    state = join(state);
-    
-    //console.log(state, stats);
-    //console.log(stats.ks);
-    
-    domElements.$panelOutput.find("textarea").val(state.output);
-    domElements.$inputCount.empty().text(countDisplay(stats.inputCount));
-    domElements.$outputCount.empty().text(countDisplay(stats.outputCount));
+            domElements.$panelStats.find(".avg").text(stats.ks["avg"]);
+            domElements.$panelStats.find(".sum").text(stats.ks["sum"]);
+            domElements.$panelStats.find(".variance").text(stats.ks["variance"]);
+            domElements.$panelStats.find(".stddev").text(stats.ks["stddev"]);
+            domElements.$panelStats.find(".mode").text(stats.ks["mode"]);
 
-    if (stats.isAllNumeric) {
-        domElements.$panelStats.closest(".row").show();
-        
-        const $tbody = domElements.$panelStats.find("table tbody");
-        
-        $tbody.find("td.min").text(stats.ks["min"]);
-        $tbody.find("td.k99gt").text(stats.ks["k99gt"]);
-        $tbody.find("td.k95gt").text(stats.ks["k95gt"]);
-        $tbody.find("td.k90gt").text(stats.ks["k90gt"]);
-        $tbody.find("td.k75gt").text(stats.ks["k75gt"]);
-        $tbody.find("td.k50").text(stats.ks["k50"]);
-        $tbody.find("td.k75lt").text(stats.ks["k75lt"]);
-        $tbody.find("td.k90lt").text(stats.ks["k90lt"]);
-        $tbody.find("td.k95lt").text(stats.ks["k95lt"]);
-        $tbody.find("td.k99lt").text(stats.ks["k99lt"]);
-        $tbody.find("td.max").text(stats.ks["max"]);
-
-        domElements.$panelStats.find("div.avg").text(stats.ks["avg"]);
-        domElements.$panelStats.find("div.sum").text(stats.ks["sum"]);
-        domElements.$panelStats.find("div.variance").text(stats.ks["variance"]);
-        domElements.$panelStats.find("div.stddev").text(stats.ks["stddev"]);
-        domElements.$panelStats.find("div.mode").text(stats.ks["mode"]);
-
-        
-        drawCandlestickChart([stats.ks["min"], stats.ks["k75gt"], stats.ks["k75lt"], stats.ks["max"]]);
-        drawHistogramChart(stats.accForward);
-    } else {
-        domElements.$panelStats.closest(".row").hide();
-    }
-    
+            drawCandlestickChart([stats.ks["min"], stats.ks["k75gt"], stats.ks["k75lt"], stats.ks["max"]]);
+            drawHistogramChart(stats.accForward);
+        } else {
+            domElements.$panelStats.closest(".row").hide();
+        }
+    };
 }
 
 //expects 4 values
@@ -177,6 +167,14 @@ function gatherState (domElements) : StateInterface {
         quoteValues: domElements.$panelOptions.find("#quoteValues").is(":checked"),
         trimValues: domElements.$panelOptions.find("#trimValues").is(":checked"),
         ignoreEmptyValues: domElements.$panelOptions.find("#ignoreEmptyValues").is(":checked"),
+        stats: {
+            inputCount: 0,
+            outputCount: 0,
+            isAllNumeric: false,
+            ks: {},
+            accForward: [],
+            accBackward: []
+        }
     };
 
     return state;
@@ -185,6 +183,7 @@ function gatherState (domElements) : StateInterface {
 function parse (input : StateInterface) : StateInterface {
     const {...state} = input;
     state.acc = state.input.replace(/(\r\n|\n|\r)/gm, '\n').split(state.inputDelimiter);
+    state.stats.inputCount = state.acc.length;
     return state;
 }
 
@@ -262,12 +261,14 @@ function sort (input : StateInterface) : StateInterface {
 
 }
 
-function gatherStatistics (_state : StateInterface, _stats : Stats) : Stats {
+function gatherStatistics (_state : StateInterface) : StateInterface {
     const {...state} = _state;
-    const {...stats} = _stats;
+    const stats = state.stats;
+
+    stats.outputCount = state.acc.length;
 
     const isNumeric = x => Number(x) === x;
-    let acc = state.acc.map(x => Number(x));
+    let acc = state.acc.map(x => Number(x.replace(/'/g, '')));
     stats.isAllNumeric = acc.every(isNumeric) && acc.length > 0;
 
     //if not numeric, see if its all numeric if we remove the first element (because of a header)
@@ -301,7 +302,8 @@ function gatherStatistics (_state : StateInterface, _stats : Stats) : Stats {
         };
     }
 
-    return stats;
+    state.stats = stats;
+    return state;
 }
 
 
@@ -322,6 +324,14 @@ function kthPercentile (k : number, input : number[], assumeSorted: boolean = fa
     }
 }
 
+function generateRandomNumbers (limit : number) : number[] {
+    const output = [];
+    for (let i = 0; i < limit; i++) {
+        output.push(_.random(0, 1000, false));
+    }
+    return output;
+}
+
 export default class Main {
     
 
@@ -335,23 +345,19 @@ export default class Main {
             $outputCount: $(".output-count")
         };
         
-        
-
         domElements.$panelInput.on("change keyup", e => render(domElements));
         domElements.$panelOptions.on("change keyup", e => render(domElements));
 
-        google.charts.setOnLoadCallback(function() {
-            domElements.$panelInput.find("textarea").val(`1
-2
-3
-4
-5
-6
-7
-8
-9
-10`).change();
-        }); 
+        $("a.example-link").on("click", function(e) {
+            const $target = $(e.target).closest('a');
+            if ($target.data("example") === "random-numbers") {
+                domElements.$panelInput.find("textarea").val(generateRandomNumbers(1000).join('\n')).change();
+                window.scrollTo(0,0);
+                domElements.$panelInput.find("textarea").focus(); 
+            }
+        });      
+
+       domElements.$panelInput.find("textarea").focus(); 
     }
 }
 
