@@ -42,7 +42,7 @@ export function trimValues (input : StateInterface) : StateInterface {
     const {...state} = input;
     if (state.trimValues) {
         state.acc = state.acc.map(x => x.trim());
-    }    
+    }
     return state;
 }
 
@@ -60,7 +60,7 @@ export function distinctValues (input : StateInterface) : StateInterface {
         state.acc = _.uniq(state.acc);
     } else if (state.distinctValues === 'DISTINCT-CASE-INSENSITIVE') {
         state.acc = _.uniqWith(state.acc, (a, b) => a.toLowerCase() === b);
-    }    
+    }
     return state;
 }
 
@@ -73,7 +73,7 @@ export function join (input : StateInterface) : StateInterface {
 export function sort (input : StateInterface) : StateInterface {
     const {...state} = input;
     if (state.sort === 'NUMERIC') {
-        state.acc = state.acc.sort((a,b) => Number(a) - Number(b));
+        state.acc = state.acc.sort((a, b) => Number(a) - Number(b));
     } else if (state.sort === 'TEXT') {
         state.acc = state.acc.sort(function (a, b) {
             if (a < b) {
@@ -116,7 +116,7 @@ export function gatherStatistics (_state : StateInterface) : StateInterface {
     let acc = state.acc.map(x => Number(x.replace(/'/g, '')));
     stats.isAllNumeric = acc.every(isNumeric) && acc.length > 0;
 
-    //if not numeric, see if its all numeric if we remove the first element (because of a header)
+    // if not numeric, see if its all numeric if we remove the first element (because of a header)
     if (!stats.isAllNumeric && acc.length > 0) {
        if (!isNumeric(acc[0])) {
            acc = acc.slice(1, acc.length);
@@ -125,7 +125,7 @@ export function gatherStatistics (_state : StateInterface) : StateInterface {
     }
 
     if (stats.isAllNumeric) {
-        stats.accForward = acc.sort((a,b) => a -b);
+        stats.accForward = acc.sort((a, b) => a - b);
         stats.accBackward = [...acc].reverse();
         stats.ks = {
             avg: _.mean(acc).toFixed(3),
@@ -140,7 +140,7 @@ export function gatherStatistics (_state : StateInterface) : StateInterface {
             k95lt: kthPercentile(95, stats.accForward, true),
             k99lt: kthPercentile(99, stats.accForward, true),
             max: Math.max(...acc),
-            sum: acc.reduce((a,b) => a+b, 0),
+            sum: acc.reduce((a, b) => a + b, 0),
             variance: ss.variance(stats.accForward).toFixed(3),
             stddev: ss.standardDeviation(stats.accForward).toFixed(3),
             mode: ss.modeSorted(stats.accForward),
@@ -157,13 +157,12 @@ export function kthPercentile (k : number, input : number[], assumeSorted: boole
         k = k / 100;
     }
     if (!assumeSorted) {
-        input = [...input].sort((a,b) => a -b);
-    }    
-    const kth = k * (input.length-1);
-    
-    if (kth == Math.ceil(kth)) {
-        
-        return input[kth+1];
+        input = [...input].sort((a, b) => a - b);
+    }
+    const kth = k * (input.length - 1);
+
+    if (kth === Math.ceil(kth)) {
+        return input[kth + 1];
     } else {
         return (input[Math.floor(kth)] + input[Math.ceil(kth)]) / 2;
     }

@@ -4,7 +4,7 @@ import {render, exampleHandler} from './render';
 (<any>window).jQuery = $;
 
 export default class Main {
-    
+
 
     constructor() {
         const domElements = {
@@ -15,13 +15,13 @@ export default class Main {
             $inputCount: $(".input-count"),
             $outputCount: $(".output-count")
         };
-        
+
         domElements.$panelInput.on("change keyup", e => render(domElements));
         domElements.$panelOptions.on("change keyup", e => render(domElements));
 
-        $("a.example-link").on("click", exampleHandler(domElements));      
+        $("a.example-link").on("click", exampleHandler(domElements));
 
-       domElements.$panelInput.find("textarea").focus(); 
+       domElements.$panelInput.find("textarea").focus();
     }
 }
 

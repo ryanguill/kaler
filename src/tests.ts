@@ -2,10 +2,10 @@
 import * as mocha from 'mocha';
 import * as chai from 'chai';
 import {
-    StateInterface, 
-    parse, 
-    ignoreEmptyValues, 
-    trimValues, 
+    StateInterface,
+    parse,
+    ignoreEmptyValues,
+    trimValues,
     quoteValues,
     distinctValues,
     join,
