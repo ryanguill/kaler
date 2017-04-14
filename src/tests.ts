@@ -43,5 +43,42 @@ function mockState () : StateInterface {
 suite(' tests', function () {
 	test('parse', async function () {
 		assert.deepEqual(parse(mockState()).acc, [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10' ]);
+
+        // \r\n should be treated just like \n
+        let state = mockState();
+        let expected = ['1','2','3','4','5'];
+        state.input = expected.join("\r\n");
+        assert.deepEqual(parse(state).acc, expected);
+
+        state.input = expected.join(",");
+        state.inputDelimiter = ",";
+        assert.deepEqual(parse(state).acc, expected);
 	});
+
+    test('trimValues', async function () {
+        let state = mockState();
+        let expected = ['a','b','c','d','e'];
+        state.input = expected.join("\n");
+        state = parse(state);
+        assert.deepEqual(trimValues(state).acc, expected, "should be the same because trimValues is false");
+
+        state.trimValues = true;
+        assert.deepEqual(trimValues(state).acc, expected, "should be the same because theres nothing to trim");
+
+        state.input = expected.map(x => ` ${x} `).join("\n");
+        state = parse(state);
+        
+        assert.deepEqual(trimValues(state).acc, expected, "padding should be trimmed");
+    });
+
+    test('quoteValues', async function () {
+        let state = mockState();
+        let expected = ['a','b','c','d','e'];
+        state.input = expected.join("\n");
+        state = parse(state);
+        assert.deepEqual(quoteValues(state).acc, expected, "should be the same because quoteValues is false");
+
+        state.quoteValues = true;
+        assert.deepEqual(quoteValues(state).acc, ["'a'", "'b'", "'c'", "'d'", "'e'"], "values should be quoted with single quotes.");
+    });
 });
