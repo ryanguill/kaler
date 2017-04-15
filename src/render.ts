@@ -47,8 +47,7 @@ export function gatherState (domElements) : StateInterface {
 			outputCount: 0,
 			isAllNumeric: false,
 			ks: {},
-			accForward: [],
-			accBackward: []
+			acc: []
 		}
 	};
 
@@ -65,11 +64,12 @@ export function render (domElements) : void {
 		.then(sort)
 		.then(gatherStatistics)
 		.then(join)
-		.then(domRender(domElements));
+		.then(domRender(domElements))
+		.catch(console.error);
 }
 
 function domRender (domElements) {
-	return function (state) {
+	return function (state : StateInterface ) {
 		const {output, stats} = state;
 		domElements.$panelOutput.find("textarea").val(output);
 		domElements.$inputCount.empty().text(countDisplay(stats.inputCount));
@@ -99,7 +99,7 @@ function domRender (domElements) {
 			if (stats.ks["k75gt"] && stats.ks["k75lt"]) {
 				drawCandlestickChart([stats.ks["min"], stats.ks["k75gt"], stats.ks["k75lt"], stats.ks["max"]]);
 			}
-			drawHistogramChart(stats.accForward);
+			drawHistogramChart(stats.acc);
 		} else {
 			domElements.$panelStats.closest(".row").hide();
 		}
@@ -143,7 +143,7 @@ function drawHistogramChart (input) {
 
 function drawScatterChart (stats) {
 	// aggregate the data
-	const aggData = stats.accForward.reduce(function (acc, element) {
+	const aggData = stats.acc.reduce(function (acc, element) {
 		const grouping = acc.data.find(x => x[0] === element);
 		if (grouping) {
 			const x = ++grouping[1];

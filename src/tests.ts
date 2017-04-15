@@ -34,8 +34,7 @@ function mockState () : StateInterface {
             outputCount: 0,
             isAllNumeric: false,
             ks: {},
-            accForward: [],
-            accBackward: []
+            acc: []
         }
     };
 }
