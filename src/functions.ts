@@ -26,7 +26,7 @@ export interface Stats {
 
 export function parse (input : StateInterface) : StateInterface {
     const {...state} = input;
-    state.acc = state.input.replace(/(\r\n|\n|\r)/gm, '\n').split(state.inputDelimiter);
+    state.acc = state.input.replace(/(\r\n|\n|\r)/gm, '\n').split(state.inputDelimiter.replace(/\\t/gm, '\t'));
     state.stats.inputCount = state.acc.length;
     return state;
 }
@@ -65,7 +65,11 @@ export function distinctValues (input : StateInterface) : StateInterface {
 
 export function join (input : StateInterface) : StateInterface {
     const {...state} = input;
-    state.output = state.acc.join(state.outputDelimiter);
+    const outputDelim = state.outputDelimiter
+        .replace(/\\r\\n/gm, '\r\n')
+        .replace(/\\n/gm, '\n')
+        .replace(/\\t/gm, '\t');
+    state.output = state.acc.join(outputDelim);
     return state;
 }
 
