@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import {render, exampleHandler} from './render';
+import {render, exampleHandler, navigate} from './render';
 
 (<any>window).jQuery = $;
 
@@ -13,7 +13,10 @@ export default class Main {
             $panelOutput: $("div.panel-output"),
             $panelStats: $("div.panel-stats"),
             $inputCount: $(".input-count"),
-            $outputCount: $(".output-count")
+            $outputCount: $(".output-count"),
+            $nav: $("ul.nav"),
+            $changeDelim: $("div.change-delim"),
+            $tabDelim: $("div.tab-delim"),
         };
 
         domElements.$panelInput.on("change keyup", e => render(domElements));
@@ -21,7 +24,10 @@ export default class Main {
 
         $("a.example-link").on("click", exampleHandler(domElements));
 
-       domElements.$panelInput.find("textarea").focus();
+        domElements.$panelInput.find("textarea").focus();
+        domElements.$nav.find("li a").on("click", navigate(domElements));
+
+        
     }
 }
 

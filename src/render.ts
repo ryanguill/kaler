@@ -24,7 +24,25 @@ export function exampleHandler (domElements) {
 			window.scrollTo(0, 0);
 			domElements.$panelInput.find("textarea").focus();
 		}
-	}
+	};
+}
+
+export function navigate (domElements) {
+	return function (e) {
+		const $target = $(e.target).closest('a');
+		const targetPage = $target.data("target");
+
+		domElements.$changeDelim.hide();
+		domElements.$tabDelim.hide();
+		domElements.$nav.find("li a").removeClass("active");
+		$target.addClass("active");
+		
+		if (targetPage === "change-delim") {
+			domElements.$changeDelim.show();
+		} else if (targetPage === "tab-delim") {
+			domElements.$tabDelim.show();
+		}
+	};
 }
 
 export function gatherState (domElements) : StateInterface {
