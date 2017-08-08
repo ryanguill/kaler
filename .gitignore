@@ -7,3 +7,7 @@ typings/**/*
 *~
 node_modules/
 testDist/
+
+.idea/
+.vscode/
+*.iml

@@ -11,7 +11,8 @@ var config = {
 	context: path.resolve('./src'),
 	entry: {
 		app: './index.ts',
-		vendor: './vendor.ts'
+		vendor: './vendor.ts',
+		tabDelim: './tabDelim/tabDelim.ts',
 	},
 	output: {
 		path: path.resolve('./dist'),
@@ -40,7 +41,15 @@ var config = {
 		}),
 		new HtmlWebpackPlugin({
 			title: 'kaler',
-			template: '!!ejs-loader!src/index.html'
+			template: '!!ejs-loader!src/index.html',
+			filename: 'index.html',
+			chunks: ['app', 'vendor']
+		}),
+		new HtmlWebpackPlugin({
+			title: 'kaler-tab',
+			template: '!!ejs-loader!src/tabDelim/tabDelim.html',
+			filename: 'tabDelim.html',
+			chunks: ['tabDelim', 'vendor']
 		}),
 		new CopyWebpackPlugin([
 			{from: 'assets', to: 'assets'}

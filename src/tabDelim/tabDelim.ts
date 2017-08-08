@@ -7,6 +7,7 @@ export default class Main {
 
 
     constructor() {
+
         const domElements = {
             $panelInput: $("div.panel-input"),
             $panelOptions: $("div.panel-options"),
@@ -28,5 +29,6 @@ export default class Main {
         domElements.$nav.find("li a").on("click", navigate(domElements));
     }
 }
+
 
 const start = new Main();

@@ -17,6 +17,7 @@
     "compile": "./node_modules/.bin/tsc",
     "test": "./node_modules/.bin/mocha testDist/tests.js --recursive --ui tdd"
   },
+  "pre-commit": [],
   "author": "ryanguill",
   "license": "ISC",
   "devDependencies": {
@@ -26,7 +27,9 @@
     "@types/jquery": "^2.0.41",
     "@types/lodash": "^4.14.50",
     "@types/mocha": "^2.2.40",
+    "@types/node": "^8.0.19",
     "chai": "^3.5.0",
+    "copy-webpack-plugin": "^4.0.1",
     "cross-env": "^3.1.4",
     "css-loader": "^0.26.1",
     "ejs-loader": "^0.3.0",
@@ -50,6 +53,7 @@
     "bluebird": "^3.5.0",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
+    "moment": "^2.18.1",
     "simple-statistics": "^3.0.0"
   }
 }

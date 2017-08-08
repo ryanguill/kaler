@@ -6,7 +6,8 @@
     "sourceMap": true,
     "outDir": "testDist",
     "lib": ["dom", "es2015"],
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": ["node"]
   },
   "exclude": [
     "node_modules",

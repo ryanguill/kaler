@@ -36,7 +36,7 @@ export function navigate (domElements) {
 		domElements.$tabDelim.hide();
 		domElements.$nav.find("li a").removeClass("active");
 		$target.addClass("active");
-		
+
 		if (targetPage === "change-delim") {
 			domElements.$changeDelim.show();
 		} else if (targetPage === "tab-delim") {
